@@ -1,13 +1,15 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { allIds, sets, idsForSet, parseProgress } from './data.js';
+import { allIds, sets, idsForSet, parseProgress } from './data.ts';
 
 test('catalog IDs stay distinct across every school, tier, and extra', () => {
   assert.equal(new Set(allIds).size, allIds.length);
   assert.equal(sets.filter(s => s.category === 'witcher').length, 7);
-  assert.equal(idsForSet(sets.find(s => s.id === 'viper')).length, 8);
-  assert.equal(idsForSet(sets.find(s => s.id === 'forgotten-wolven')).length, 18);
-  assert.equal(idsForSet(sets.find(s => s.id === 'feline')).length, 31);
+  for (const [id, expected] of [['viper', 8], ['forgotten-wolven', 18], ['feline', 31]] as const) {
+    const set = sets.find(set => set.id === id);
+    assert.ok(set, `Missing catalog set: ${id}`);
+    assert.equal(idsForSet(set).length, expected);
+  }
 });
 
 test('saved progress accepts only known checked items', () => {
